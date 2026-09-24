@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SistemaPortaria - PortariaOS</title>
+  <!-- Pico CSS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Tela de Login -->
+  <div id="login-screen" class="container">
+    <article class="login-card">
+      <header>
+        <div class="brand">
+          <i data-lucide="shield-check" class="icon-lg"></i>
+          <h2>SistemaPortaria</h2>
+        </div>
+        <p>Controle de Acesso e Gestão de Portaria</p>
+      </header>
+      <form id="login-form">
+        <label for="email">
+          E-mail
+          <input type="email" id="email" placeholder="exemplo@condo.com" required value="admin@condo.com">
+        </label>
+        <label for="senha">
+          Senha
+          <input type="password" id="senha" placeholder="Sua senha" required value="123456">
+        </label>
+        <button type="submit" class="contrast">
+          <i data-lucide="log-in"></i> Entrar no Sistema
+        </button>
+      </form>
+      <footer>
+        <small class="hint-text">Contas de teste predefinidas: admin@condo.com, porteiro@condo.com, morador@condo.com (Senha: 123456)</small>
+      </footer>
+    </article>
+  </div>
+
+  <!-- App Principal (Dashboard) -->
+  <div id="app-screen" class="hidden">
+    <nav class="container-fluid navbar">
+      <ul>
+        <li>
+          <strong class="brand-title">
+            <i data-lucide="building"></i> PortariaOS
+          </strong>
+        </li>
+      </ul>
+      <ul>
+        <li><a href="#" id="nav-guarita" class="nav-link active"><i data-lucide="monitor"></i> Guarita</a></li>
+        <li><a href="#" id="nav-encomendas" class="nav-link"><i data-lucide="package"></i> Encomendas</a></li>
+        <li><a href="#" id="nav-visitas" class="nav-link"><i data-lucide="users"></i> Visitas & Acessos</a></li>
+        <li><a href="#" id="nav-ocorrencias" class="nav-link"><i data-lucide="alert-circle"></i> Ocorrências</a></li>
+        <li><a href="#" id="nav-comunicados" class="nav-link"><i data-lucide="megaphone"></i> Mural</a></li>
+        <li>
+          <details role="list" dir="rtl">
+            <summary aria-haspopup="listbox" role="button" class="secondary outline btn-sm">
+              <span id="user-display-name">Usuário</span>
+            </summary>
+
+              <li><a href="#" id="btn-logout"><i data-lucide="log-out"></i> Sair</a></li>
+
+          </details>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="container">
+
+      <!-- MÓDULO: GUARITA / OPERAÇÃO DA PORTARIA -->
+      <section id="sec-guarita" class="tab-content">
+        <h3><i data-lucide="shield"></i> Painel Operacional da Guarita</h3>
+        <div class="grid">
+          <article>
+            <header><strong><i data-lucide="user-check"></i> Check-in Rápido</strong></header>
+            <form id="form-checkin">
+              <label for="checkin-nome">
+                Nome do Visitante / Prestador
+                <input type="text" id="checkin-nome" placeholder="ex: João Silva" required>
+              </label>
+              <label for="checkin-metodo">
+                Método de Autenticação
+                <select id="checkin-metodo">
+                  <option value="Manual">Manual (Guarita)</option>
+                  <option value="QR_Code">QR Code</option>
+                  <option value="Face_ID">Face ID / Biometria</option>
+                  <option value="Placa_FaceID">Placa + Face ID</option>
+                </select>
+              </label>
+              <label for="checkin-obs">
+                Observações / Destino
+                <input type="text" id="checkin-obs" placeholder="ex: Apto 101 Bloco A">
+              </label>
+              <div class="grid">
+                <button type="submit" class="contrast"><i data-lucide="log-in"></i> Registrar Entrada</button>
+                <button type="button" id="btn-checkout" class="secondary"><i data-lucide="log-out"></i> Registrar Saída</button>
+              </div>
+            </form>
+          </article>
+
+          <article>
+            <header><strong><i data-lucide="activity"></i> Últimas Movimentações na Guarita</strong></header>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data/Hora</th>
+                    <th>Pessoa / Visitante</th>
+                    <th>Tipo</th>
+                    <th>Método</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-historico-acessos">
+                  <!-- Inserido dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- MÓDULO: ENCOMENDAS -->
+      <section id="sec-encomendas" class="tab-content hidden">
+        <div class="header-action">
+          <h3><i data-lucide="package"></i> Gestão de Encomendas</h3>
+          <button id="btn-modal-encomenda" class="btn-sm contrast porteiro-only"><i data-lucide="plus"></i> Receber Encomenda</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Cód. Rastreio</th>
+                <th>Unidade</th>
+                <th>Remetente</th>
+                <th>Data Recebimento</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-encomendas">
+              <!-- Inserido dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MÓDULO: VISITAS & PRÉ-AUTORIZAÇÕES -->
+      <section id="sec-visitas" class="tab-content hidden">
+        <div class="header-action">
+          <h3><i data-lucide="users"></i> Visitas & Pré-Autorizações</h3>
+          <button id="btn-modal-visita" class="btn-sm contrast"><i data-lucide="user-plus"></i> Nova Autorização</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Visitante</th>
+                <th>CPF</th>
+                <th>Unidade</th>
+                <th>Tipo</th>
+                <th>Token QR</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-visitas">
+              <!-- Inserido dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MÓDULO: OCORRÊNCIAS -->
+      <section id="sec-ocorrencias" class="tab-content hidden">
+        <div class="header-action">
+          <h3><i data-lucide="alert-circle"></i> Ocorrências & Solicitações</h3>
+          <button id="btn-modal-ocorrencia" class="btn-sm contrast"><i data-lucide="plus-circle"></i> Registrar Ocorrência</button>
+        </div>
+
+        <div id="cards-ocorrencias" class="ocorrencias-grid">
+          <!-- Inserido dinamicamente -->
+        </div>
+      </section>
+
+      <!-- MÓDULO: COMUNICADOS -->
+      <section id="sec-comunicados" class="tab-content hidden">
+        <div class="header-action">
+          <h3><i data-lucide="megaphone"></i> Mural de Comunicados</h3>
+          <button id="btn-modal-comunicado" class="btn-sm contrast admin-only"><i data-lucide="file-plus"></i> Novo Comunicado</button>
+        </div>
+
+        <div id="cards-comunicados" class="comunicados-list">
+          <!-- Inserido dinamicamente -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: NOVA ENCOMENDA -->
+  <dialog id="modal-encomenda">
+    <article>
+      <header>
+        <button aria-label="Close" class="close" data-target="modal-encomenda"></button>
+        <strong>Registrar Recebimento de Encomenda</strong>
+      </header>
+      <form id="form-nova-encomenda">
+        <label for="enc-unidade">
+          Unidade de Destino
+          <select id="enc-unidade" required></select>
+        </label>
+        <label for="enc-rastreio">
+          Código de Rastreio
+          <input type="text" id="enc-rastreio" placeholder="ex: BR987654321">
+        </label>
+        <label for="enc-remetente">
+          Remetente / Transportadora
+          <input type="text" id="enc-remetente" placeholder="ex: Amazon, Correios">
+        </label>
+        <label for="enc-desc">
+          Descrição / Qtd Pacotes
+          <input type="text" id="enc-desc" placeholder="ex: 1 caixa média">
+        </label>
+        <footer>
+          <button type="submit" class="contrast">Salvar Encomenda</button>
+        </footer>
+      </form>
+    </article>
+  </dialog>
+
+  <!-- MODAL: NOVA PRÉ-AUTORIZAÇÃO -->
+  <dialog id="modal-visita">
+    <article>
+      <header>
+        <button aria-label="Close" class="close" data-target="modal-visita"></button>
+        <strong>Criar Pré-Autorização de Acesso</strong>
+      </header>
+      <form id="form-nova-visita">
+        <label for="vis-nome">
+          Nome do Visitante / Prestador
+          <input type="text" id="vis-nome" required placeholder="ex: Maria Santos">
+        </label>
+        <label for="vis-cpf">
+          CPF do Visitante
+          <input type="text" id="vis-cpf" placeholder="ex: 333.333.333-33">
+        </label>
+        <label for="vis-tipo">
+          Tipo
+          <select id="vis-tipo">
+            <option value="Visitante">Visitante</option>
+            <option value="Prestador">Prestador de Serviço</option>
+          </select>
+        </label>
+        <label for="vis-motivo">
+          Motivo / Observação
+          <input type="text" id="vis-motivo" placeholder="ex: Manutenção de ar condicionado">
+        </label>
+        <footer>
+          <button type="submit" class="contrast">Gerar Autorização</button>
+        </footer>
+      </form>
+    </article>
+  </dialog>
+
+  <!-- MODAL: NOVA OCORRÊNCIA -->
+  <dialog id="modal-ocorrencia">
+    <article>
+      <header>
+        <button aria-label="Close" class="close" data-target="modal-ocorrencia"></button>
+        <strong>Registrar Ocorrência Digital</strong>
+      </header>
+      <form id="form-nova-ocorrencia">
+        <label for="oco-cat">
+          Categoria
+          <select id="oco-cat" required>
+            <option value="Barulho / Incomodo">Barulho / Incomodo</option>
+            <option value="Estacionamento / Vagas">Estacionamento / Vagas</option>
+            <option value="Manutenção de Área Comum">Manutenção de Área Comum</option>
+            <option value="Segurança">Segurança</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </label>
+        <label for="oco-desc">
+          Descrição Detalhada
+          <textarea id="oco-desc" rows="4" required placeholder="Descreva o ocorrido..."></textarea>
+        </label>
+        <footer>
+          <button type="submit" class="contrast">Enviar Ocorrência</button>
+        </footer>
+      </form>
+    </article>
+  </dialog>
+
+  <!-- MODAL: NOVO COMUNICADO -->
+  <dialog id="modal-comunicado">
+    <article>
+      <header>
+        <button aria-label="Close" class="close" data-target="modal-comunicado"></button>
+        <strong>Publicar Comunicado no Mural</strong>
+      </header>
+      <form id="form-novo-comunicado">
+        <label for="com-titulo">
+          Título do Aviso
+          <input type="text" id="com-titulo" required placeholder="ex: Manutenção na Caixa d'Água">
+        </label>
+        <label for="com-conteudo">
+          Conteúdo do Comunicado
+          <textarea id="com-conteudo" rows="4" required placeholder="Escreva as informações..."></textarea>
+        </label>
+        <footer>
+          <button type="submit" class="contrast">Publicar Aviso</button>
+        </footer>
+      </form>
+    </article>
+  </dialog>
+
+  <!-- Custom App JS -->
+  <script src="app.js"></script>
+</body>
+</html>
