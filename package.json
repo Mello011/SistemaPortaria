@@ -1,0 +1,26 @@
+{
+  "name": "sistema-portaria",
+  "version": "1.0.0",
+  "description": "SistemaPortaria - Sistema de Controle de Acesso e Gestão de Portaria",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test tests/api.test.js"
+  },
+  "keywords": [
+    "portaria",
+    "condominio",
+    "controle-de-acesso"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.0"
+  }
+}
